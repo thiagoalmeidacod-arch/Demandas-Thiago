@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Minhas Demandas — Thiago</title>
+<style>
+:root{
+  --b:#1a3a5c; --o:#e07020; --f:'Segoe UI',system-ui,sans-serif;
+  --baixa:#3aad5c; --media:#f0a500; --alta:#e74c3c;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--f);background:#f3f5f7;color:#222}
+.hdr{background:var(--b);color:#fff;padding:1.2rem 1.5rem;border-bottom:4px solid var(--o)}
+.hdr-in{max-width:1100px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
+.hdr h1{font-size:1.4rem;font-weight:700}
+.hdr h1 span{color:var(--o)}
+.hdr p{font-size:12px;color:#cdd6e0;margin-top:2px}
+.clock{font-size:12px;text-align:right;color:#cdd6e0}
+.wrap{max-width:1100px;margin:0 auto;padding:1.5rem}
+.toolbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.2rem;flex-wrap:wrap;gap:10px}
+.si{padding:9px 12px;border-radius:8px;border:1px solid #ddd;font-size:13px;font-family:var(--f);background:#fff;max-width:240px}
+.filtros{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.add{background:var(--o);color:#fff;border:none;padding:10px 18px;border-radius:8px;font-weight:600;font-size:13px;cursor:pointer;font-family:var(--f)}
+.add:hover{opacity:.9}
+.ind-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin-bottom:1.5rem}
+.ds{background:#fff;border-radius:12px;border:.5px solid rgba(0,0,0,.08);border-top:3px solid #ddd;padding:1rem;text-align:center}
+.dvl{font-size:1.6rem;font-weight:700;color:var(--b)}
+.dtt{font-size:11px;color:#888;margin-top:2px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
+.card{background:#fff;border-radius:12px;border:.5px solid rgba(0,0,0,.08);border-left:4px solid #ddd;padding:1rem 1.1rem;cursor:pointer;transition:box-shadow .15s}
+.card:hover{box-shadow:0 2px 12px rgba(26,58,92,.12)}
+.ch{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;gap:8px}
+.ct{font-size:14px;font-weight:600;color:var(--b)}
+.tg{font-size:10px;font-weight:600;padding:3px 9px;border-radius:8px;white-space:nowrap}
+.t-afazer{background:#E6F1FB;color:#185FA5}
+.t-andamento{background:#FFF8E6;color:#7a5200}
+.t-concluido{background:#DFF3E3;color:#1a6630}
+.pr{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px}
+.pr-baixa{background:var(--baixa)}
+.pr-media{background:var(--media)}
+.pr-alta{background:var(--alta)}
+.cf{font-size:12px;color:#555;line-height:1.7}
+.ci{margin-bottom:2px}
+.ci span{color:#1a1a1a;font-weight:500}
+.ld{text-align:center;padding:2.5rem;color:#aaa;font-size:13px}
+.fl{color:var(--o);font-size:12px;cursor:pointer;font-weight:500}
+/* Modal */
+.mb{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;z-index:50;padding:1rem}
+.md{background:#fff;border-radius:14px;padding:1.6rem;max-width:440px;width:100%;max-height:90vh;overflow-y:auto}
+.md h2{font-size:1.1rem;color:var(--b);margin-bottom:1rem}
+.fd{margin-bottom:.9rem}
+.fd label{display:block;font-size:12px;color:#666;margin-bottom:4px;font-weight:500}
+.fd input,.fd select,.fd textarea{width:100%;padding:9px 11px;border-radius:8px;border:1px solid #ddd;font-size:13px;font-family:var(--f)}
+.fd textarea{resize:vertical;min-height:60px}
+.tc2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.hint{font-size:11px;margin-top:4px}
+.mbt{display:flex;gap:8px;margin-top:1.2rem}
+.bsv{flex:1;background:var(--b);color:#fff;border:none;padding:11px;border-radius:8px;font-weight:600;cursor:pointer;font-family:var(--f)}
+.bdl{background:#fdecea;color:#c0392b;border:none;padding:11px 16px;border-radius:8px;font-weight:600;cursor:pointer;font-family:var(--f)}
+.bcl{background:transparent;color:#888;border:1px solid #ddd;padding:11px 16px;border-radius:8px;cursor:pointer;font-family:var(--f)}
+@media(max-width:600px){.tc2{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="hdr-in">
+    <div>
+      <h1>Minhas <span>Demandas</span></h1>
+      <p>Organização pessoal — Thiago</p>
+    </div>
+    <div class="clock" id="clock"></div>
+  </div>
+</div>
+
+<div class="wrap">
+  <div id="indicadores" class="ind-grid"></div>
+
+  <div class="toolbar">
+    <div class="filtros">
+      <input class="si" type="text" placeholder="🔍 Buscar demanda..." oninput="window.buscar(this.value)"/>
+      <select class="si" id="filtSt" onchange="window.filtrar('status',this.value)">
+        <option value="">Todos os status</option>
+        <option value="afazer">A fazer</option>
+        <option value="andamento">Em andamento</option>
+        <option value="concluido">Concluído</option>
+      </select>
+      <select class="si" id="filtPr" onchange="window.filtrar('prioridade',this.value)">
+        <option value="">Todas prioridades</option>
+        <option value="Alta">Alta</option>
+        <option value="Média">Média</option>
+        <option value="Baixa">Baixa</option>
+      </select>
+      <span class="fl" onclick="window.limparFiltros()">✕ Limpar</span>
+    </div>
+    <button class="add" onclick="window.novaDemanda()">+ Nova demanda</button>
+  </div>
+
+  <div id="grid" class="grid"><div class="ld">Carregando...</div></div>
+</div>
+
+<div id="modal" style="display:none"></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
+import { getFirestore, collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc }
+  from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDgtReHbEgiVuC4cITDY7SUpXhS1mLk2Eo",
+  authDomain: "demandas-thiago.firebaseapp.com",
+  projectId: "demandas-thiago",
+  storageBucket: "demandas-thiago.firebasestorage.app",
+  messagingSenderId: "1069218114016",
+  appId: "1:1069218114016:web:6d079b1d60be8775d56385"
+};
+
+const app = initializeApp(firebaseConfig);
+const db  = getFirestore(app);
+const col = collection(db,"demandas");
+
+let demandas=[], editId=null, busca='', fStatus='', fPrioridade='';
+
+const ST = {
+  afazer:    {lb:'A fazer',       cls:'t-afazer'},
+  andamento: {lb:'Em andamento',  cls:'t-andamento'},
+  concluido: {lb:'Concluído',     cls:'t-concluido'},
+};
+const st = s => ST[s]||ST.afazer;
+
+const PR_CLS = {Alta:'pr-alta', Média:'pr-media', Baixa:'pr-baixa'};
+
+function fmt(d){ if(!d)return ''; const [y,m,dd]=d.split('-'); return dd+'/'+m+'/'+y; }
+function diasParaPrazo(prazo){
+  if(!prazo) return null;
+  const hoje=new Date(); hoje.setHours(0,0,0,0);
+  return Math.round((new Date(prazo+'T00:00:00')-hoje)/86400000);
+}
+
+function horaAtrasada(prazo, hora){
+  if(!hora||!prazo) return false;
+  const agora = new Date();
+  const hoje  = agora.toISOString().split('T')[0];
+  if(prazo !== hoje) return false;
+  const [h,m] = hora.split(':').map(Number);
+  return agora.getHours() > h || (agora.getHours() === h && agora.getMinutes() >= m);
+}
+
+function cardHtml(d){
+  const s=st(d.status);
+  const dias=diasParaPrazo(d.prazo);
+  const horaAtr = d.status!=='concluido' && horaAtrasada(d.prazo, d.horaLimite);
+  let prazoTxt='', prazoCor='#555';
+  if(dias!==null && d.status!=='concluido'){
+    if(dias<0){ prazoTxt='⚠ Atrasado '+Math.abs(dias)+'d'; prazoCor='#e74c3c'; }
+    else if(dias===0 && horaAtr){ prazoTxt='⚠ Hora limite ultrapassada'; prazoCor='#e74c3c'; }
+    else if(dias===0){ prazoTxt='⏰ Vence hoje'+(d.horaLimite?' até '+d.horaLimite:''); prazoCor='#f0a500'; }
+    else { prazoTxt='Faltam '+dias+'d'; prazoCor='#555'; }
+  }
+  // Cor da borda: vermelho se atrasado, laranja se vence hoje, por prioridade senão
+  const bordaCor = (dias<0||horaAtr) ? '#e74c3c'
+    : dias===0 ? '#f0a500'
+    : d.prioridade==='Alta' ? '#e74c3c'
+    : d.prioridade==='Média' ? '#f0a500'
+    : d.prioridade==='Baixa' ? '#3aad5c'
+    : '#1a3a5c';
+  return '<div class="card" style="border-left-color:'+bordaCor+'" onclick="window.editar(\''+d.id+'\')">'+
+    '<div class="ch">'+
+    '<div class="ct">'+(d.prioridade?'<span class="pr '+(PR_CLS[d.prioridade]||'')+'"></span>':'')+(d.titulo||'—')+'</div>'+
+    '<span class="tg '+s.cls+'">'+s.lb+'</span>'+
+    '</div>'+
+    '<div class="cf">'+
+    (d.descricao?'<div class="ci">📝 <span>'+d.descricao+'</span></div>':'')+
+    (d.prazo?'<div class="ci">📅 Prazo: <span style="color:'+prazoCor+'">'+fmt(d.prazo)+(prazoTxt?' — '+prazoTxt:'')+'</span></div>':'')+
+    (d.horaLimite&&d.status!=='concluido'?'<div class="ci">🕐 Hora limite: <span style="color:'+(horaAtr?'#e74c3c':'#555')+'">'+d.horaLimite+(horaAtr?' ⚠':'')+'</span></div>':'')+
+    (d.prioridade?'<div class="ci">🔥 Prioridade: <span>'+d.prioridade+'</span></div>':'')+
+    (d.obs?'<div class="ci">💬 <span>'+d.obs+'</span></div>':'')+
+    '</div></div>';
+}
+
+function render(){
+  const lista = demandas.filter(d=>{
+    const okB = !busca || (d.titulo||'').toLowerCase().includes(busca.toLowerCase());
+    const okS = !fStatus || d.status===fStatus;
+    const okP = !fPrioridade || d.prioridade===fPrioridade;
+    return okB && okS && okP;
+  }).sort((a,b)=>{
+    const ordem={afazer:0,andamento:1,concluido:2};
+    const oa=ordem[a.status]??0, ob=ordem[b.status]??0;
+    if(oa!==ob) return oa-ob;
+    return (a.prazo||'').localeCompare(b.prazo||'');
+  });
+
+  const grid=document.getElementById('grid');
+  grid.innerHTML = lista.length ? lista.map(cardHtml).join('') : '<div class="ld">Nenhuma demanda encontrada.</div>';
+
+  // Indicadores
+  const total=demandas.length;
+  const afazer=demandas.filter(d=>d.status==='afazer').length;
+  const andamento=demandas.filter(d=>d.status==='andamento').length;
+  const concluido=demandas.filter(d=>d.status==='concluido').length;
+  const atrasadas=demandas.filter(d=>d.status!=='concluido'&&diasParaPrazo(d.prazo)<0).length;
+
+  document.getElementById('indicadores').innerHTML = [
+    {v:total,     lb:'Total de demandas', cor:'#1a3a5c'},
+    {v:afazer,    lb:'A fazer',           cor:'#378ADD'},
+    {v:andamento, lb:'Em andamento',      cor:'#f0a500'},
+    {v:concluido, lb:'Concluídas',        cor:'#3aad5c'},
+    {v:atrasadas, lb:'Atrasadas',         cor:'#e74c3c'},
+  ].map(c=>'<div class="ds" style="border-top-color:'+c.cor+'"><div class="dvl" style="color:'+c.cor+'">'+c.v+'</div><div class="dtt">'+c.lb+'</div></div>').join('');
+}
+
+onSnapshot(col, snap=>{
+  demandas = snap.docs.map(d=>({id:d.id,...d.data()}));
+  render();
+});
+
+window.buscar = v => { busca=v; render(); };
+window.filtrar = (campo,v) => { if(campo==='status')fStatus=v; if(campo==='prioridade')fPrioridade=v; render(); };
+window.limparFiltros = () => {
+  busca=''; fStatus=''; fPrioridade='';
+  document.getElementById('filtSt').value='';
+  document.getElementById('filtPr').value='';
+  document.querySelector('input[type="text"]').value='';
+  render();
+};
+
+function buildModal(d){
+  const s=d?d.status:'afazer';
+  return '<div class="md">'+
+    '<h2>'+(d?'Editar demanda':'Nova demanda')+'</h2>'+
+    '<div class="fd"><label>Título</label><input id="mTit" value="'+(d&&d.titulo||'')+'" placeholder="Ex: Atualizar planilha de custos"/></div>'+
+    '<div class="fd"><label>Descrição</label><textarea id="mDesc" placeholder="Detalhes da demanda...">'+(d&&d.descricao||'')+'</textarea></div>'+
+    '<div class="tc2">'+
+    '<div class="fd"><label>Prazo</label><input id="mPrazo" type="date" value="'+(d&&d.prazo||'')+'"/></div>'+
+    '<div class="fd"><label>Hora Limite</label><input id="mHora" type="time" value="'+(d&&d.horaLimite||'')+'"/></div>'+
+    '</div>'+
+    '<div class="tc2">'+
+    '<div class="fd"><label>Status</label><select id="mSt">'+
+    '<option value="afazer"'+(s==='afazer'?' selected':'')+'>A fazer</option>'+
+    '<option value="andamento"'+(s==='andamento'?' selected':'')+'>Em andamento</option>'+
+    '<option value="concluido"'+(s==='concluido'?' selected':'')+'>Concluído</option>'+
+    '</select></div>'+
+    '</div>'+
+    '<div class="fd"><label>Prioridade</label><select id="mPr">'+
+    '<option value="">Selecione...</option>'+
+    ['Alta','Média','Baixa'].map(p=>'<option value="'+p+'"'+(d&&d.prioridade===p?' selected':'')+'>'+p+'</option>').join('')+
+    '</select></div>'+
+    '<div class="fd"><label>Observação</label><input id="mObs" value="'+(d&&d.obs||'')+'" placeholder="Observação livre"/></div>'+
+    '<div class="mbt">'+
+    '<button class="bsv" onclick="window.salvar()">Salvar</button>'+
+    (d?'<button class="bdl" onclick="window.remover()">Remover</button>':'')+
+    '<button class="bcl" onclick="window.fechar()">Cancelar</button>'+
+    '</div></div>';
+}
+
+window.novaDemanda = () => {
+  editId=null;
+  const m=document.getElementById('modal');
+  m.innerHTML='<div class="mb" onclick="if(event.target===this)window.fechar()">'+buildModal(null)+'</div>';
+  m.style.display='';
+};
+
+window.editar = id => {
+  editId=id;
+  const d=demandas.find(x=>x.id===id);
+  if(!d)return;
+  const m=document.getElementById('modal');
+  m.innerHTML='<div class="mb" onclick="if(event.target===this)window.fechar()">'+buildModal(d)+'</div>';
+  m.style.display='';
+};
+
+window.salvar = async () => {
+  const gv = id => (document.getElementById(id)||{}).value||'';
+  const titulo=gv('mTit').trim();
+  if(!titulo){ alert('Informe o título da demanda.'); return; }
+  const data={
+    titulo, descricao:gv('mDesc').trim(), prazo:gv('mPrazo'), horaLimite:gv('mHora'),
+    status:gv('mSt'), prioridade:gv('mPr'), obs:gv('mObs').trim()
+  };
+  try{
+    if(editId){ await updateDoc(doc(db,'demandas',editId),data); }
+    else{ await addDoc(col,data); }
+    window.fechar();
+  }catch(err){ alert('Erro: '+err.message); }
+};
+
+window.remover = async () => {
+  if(!confirm('Remover esta demanda?')) return;
+  try{ await deleteDoc(doc(db,'demandas',editId)); window.fechar(); }
+  catch(err){ alert('Erro: '+err.message); }
+};
+
+window.fechar = () => { document.getElementById('modal').style.display='none'; };
+
+function tick(){
+  const n=new Date();
+  document.getElementById('clock').innerHTML=
+    n.toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'2-digit',year:'numeric'})+
+    '<br>'+n.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+}
+tick(); setInterval(tick,60000);
+setInterval(render, 60000); // atualiza cards a cada minuto (hora limite)
+</script>
+</body>
+</html>
